@@ -12,5 +12,55 @@ CHIP Mux16 {
     OUT out[16];
 
     PARTS:
-    //// Replace this comment with your code.
+    Not(in=sel, out=notsel);
+    
+    And(a=sel, b=b[0], out=fromb0);
+    And(a=a[0], b=notsel, out=froma0);
+    Or(a=froma0, b=fromb0, out=out[0]);
+    
+    And(a=sel, b=b[1], out=fromb1);
+    And(a=a[1], b=notsel, out=froma1);
+    Or(a=froma1, b=fromb1, out=out[1]);
+    And(a=sel, b=b[2], out=fromb2);
+    And(a=a[2], b=notsel, out=froma2);
+    Or(a=froma2, b=fromb2, out=out[2]);
+    And(a=sel, b=b[3], out=fromb3);
+    And(a=a[3], b=notsel, out=froma3);
+    Or(a=froma3, b=fromb3, out=out[3]);
+    And(a=sel, b=b[4], out=fromb4);
+    And(a=a[4], b=notsel, out=froma4);
+    Or(a=froma4, b=fromb4, out=out[4]);
+    And(a=sel, b=b[5], out=fromb5);
+    And(a=a[5], b=notsel, out=froma5);
+    Or(a=froma5, b=fromb5, out=out[5]);
+    And(a=sel, b=b[6], out=fromb6);
+    And(a=a[6], b=notsel, out=froma6);
+    Or(a=froma6, b=fromb6, out=out[6]);
+    And(a=sel, b=b[7], out=fromb7);
+    And(a=a[7], b=notsel, out=froma7);
+    Or(a=froma7, b=fromb7, out=out[7]);
+    And(a=sel, b=b[8], out=fromb8);
+    And(a=a[8], b=notsel, out=froma8);
+    Or(a=froma8, b=fromb8, out=out[8]);
+    And(a=sel, b=b[9], out=fromb9);
+    And(a=a[9], b=notsel, out=froma9);
+    Or(a=froma9, b=fromb9, out=out[9]);
+    And(a=sel, b=b[10], out=fromb10);
+    And(a=a[10], b=notsel, out=froma10);
+    Or(a=froma10, b=fromb10, out=out[10]);
+    And(a=sel, b=b[11], out=fromb11);
+    And(a=a[11], b=notsel, out=froma11);
+    Or(a=froma11, b=fromb11, out=out[11]);
+    And(a=sel, b=b[12], out=fromb12);
+    And(a=a[12], b=notsel, out=froma12);
+    Or(a=froma12, b=fromb12, out=out[12]);
+    And(a=sel, b=b[13], out=fromb13);
+    And(a=a[13], b=notsel, out=froma13);
+    Or(a=froma13, b=fromb13, out=out[13]);
+    And(a=sel, b=b[14], out=fromb14);
+    And(a=a[14], b=notsel, out=froma14);
+    Or(a=froma14, b=fromb14, out=out[14]);
+    And(a=sel, b=b[15], out=fromb15);
+    And(a=a[15], b=notsel, out=froma15);
+    Or(a=froma15, b=fromb15, out=out[15]);
 }
