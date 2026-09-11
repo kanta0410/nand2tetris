@@ -32,5 +32,57 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    ///loadなど
+    //loadA
+	Not(in=instruction[15], out=Notinstruction);
+    And(a=instruction[15], b=instruction[5], out=cmeirei);
+    Or(a=Notinstruction, b=cmeirei, out=loadA);
+
+    //loadD
+    And(a=instruction[4], b=instruction[15], out=loadD);
+
+    //writeM
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    ///値計算
+    //Aregister
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=outmux16);
+    ARegister(in=outmux16, load=loadA, out=RegisterA, out[0..14]=addressM);
+
+    //Dregister
+    DRegister(in=aluOut, load=loadD, out=RegisterD);
+    
+    //y
+    Mux16(a=RegisterA, b=inM, sel=instruction[12], out=out2mux16);
+
+    //ALU
+    ALU(x=RegisterD, y=out2mux16,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f=instruction[7],
+        no=instruction[6],
+        out=outM,
+        out=aluOut,
+        zr=zr,
+        ng=ng
+        );
+
+    //PCregister
+    PC(in=RegisterA, inc=true, load=loadPC, reset=reset, out[0..14]=pc);
+
+    ///ジャンプ
+    //jump
+    Or(a=zr, b=ng, out=notpos);
+    Not(in=notpos, out=pos);
+
+    And(a=instruction[2], b=ng, out=ngjump);
+    And(a=instruction[1], b=zr, out=zjump);
+    And(a=instruction[0], b=pos, out=pjump);
+    Or(a=ngjump, b=zjump, out=negOrzerojump);
+    Or(a=negOrzerojump, b=pjump, out=jump);
+    And(a=jump, b=instruction[15], out=loadPC);
+
+
 }
