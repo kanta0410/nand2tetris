@@ -2,7 +2,7 @@
 # .vmファイルを読んで、コメント/空行を除いたコマンドの並びにし、
 # 各コマンドを種類判定・引数(arg1, arg2)に分解する
 
-# プロジェクト7で登場する算術・論理コマンド一覧（それ以外はpush/pop）
+# プロジェクト7で登場する算術・論理コマンド一覧
 ARITHMETIC_COMMANDS = {"add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not"}
 
 
@@ -20,10 +20,16 @@ def clean_lines(filepath):
 def command_type(line):
     """
     1行を受け取り、コマンドの種類を文字列で返す。
-    プロジェクト7で登場するのは以下の3種類だけ:
+    プロジェクト8では、まずlabelも登場する:
       "C_ARITHMETIC" : add, sub, neg, eq, gt, lt, and, or, not のどれか
       "C_PUSH"       : "push"で始まる行
       "C_POP"        : "pop"で始まる行
+      "C_LABEL"      : "label"で始まる行
+      "C_GOTO"       : "goto"で始まる行
+      "C_IF"         : "if-goto"で始まる行
+      "C_FUNCTION"   : "function"で始まる行
+      "C_RETURN"     : "return"で始まる行
+      "C_CALL"       : "call"で始まる行
     ヒント:
       - line.split() で空白区切りの単語リストにする
         （例: "push local 2" -> ["push", "local", "2"]）
@@ -35,6 +41,25 @@ def command_type(line):
         return "C_PUSH"
     elif words[0] == "pop":
         return "C_POP"
+    elif words[0] == "label":
+      # ここを埋める: label命令の種類名を返す
+        return "C_LABEL"
+    elif words[0] == "goto":
+      # ここを埋める: goto命令の種類名を返す
+        return "C_GOTO"
+    elif words[0] == "if-goto":
+        return "C_IF"
+    elif words[0] == "function":
+        return "C_FUNCTION"
+        # ここを埋める: function命令の種類名を返す
+        
+    elif words[0] == "return":
+        return "C_RETURN"
+        # ここを埋める: return命令の種類名を返す
+    elif words[0] == "call":
+      # ここを埋める: call命令の種類名を返す
+        return "C_CALL"
+  
     elif words[0] in ARITHMETIC_COMMANDS:
         return "C_ARITHMETIC"
     pass
@@ -45,6 +70,7 @@ def arg1(line):
     コマンドの1つ目の引数を返す。
       - C_ARITHMETIC の場合: コマンド自体の文字列（例: "add" -> "add"）
       - C_PUSH / C_POP の場合: セグメント名（例: "push local 2" -> "local"）
+      - C_LABEL の場合: ラベル名（例: "label LOOP" -> "LOOP"）
     ヒント:
       - words = line.split() を使う
       - command_type(line) が "C_ARITHMETIC" なら words[0] を返す
@@ -52,6 +78,9 @@ def arg1(line):
     """
     if command_type(line) == "C_ARITHMETIC":
         return line.split()[0]
+    elif command_type(line) == "C_RETURN":
+      # ここを埋める: returnにはarg1がない
+      pass
     else:
         return line.split()[1]
     pass

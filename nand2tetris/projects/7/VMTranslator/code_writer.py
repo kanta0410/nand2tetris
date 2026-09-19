@@ -227,3 +227,94 @@ def write_pop(segment, index, filename=None):
     else:
         return "\n".join([f"@{SEGMENT_POINTER[segment]}", "D=M", f"@{index}", "D=D+A", "@R13", "M=D", "@SP", "AM=M-1", "D=M", "@R13", "A=M", "M=D"])
     
+    
+def write_label(label):
+    return f"({label})"
+
+
+def write_goto(label):
+    """goto LABEL を、LABELへの無条件ジャンプに変換する。"""
+    # ここを埋める: LABELへジャンプするアセンブリを返す
+    return "\n".join([f"@{label}", "0;JMP"])
+
+  
+def write_if(label):
+    """if-goto LABEL を、スタックの値による条件付きジャンプに変換する。"""
+    # ここを埋める: スタックを1つ取り出し、0以外ならLABELへジャンプする
+    return "\n".join(["@SP", "AM=M-1", "D=M", f"@{label}", "D;JNE"])
+
+def write_function(function_name, num_locals):
+    """function NAME n を関数入口とlocal初期化に変換する。"""
+    # 呼び出された関数Bの部屋を作る
+    label_code = write_label(function_name)
+    # B専用のlocalを0で初期化する
+    local_init_code = "\n".join([write_push_constant(0) for _ in range(num_locals)])
+    return "\n".join([label_code, local_init_code])
+
+
+def write_return():
+    """return を呼び出し元へ戻るアセンブリに変換する。"""
+    # Bのフレームと、Aへ戻る道を一時保存する
+    FRAME = "R13"
+    RET = "R14"
+    # FRAME - 1 = AのTHAT / FRAME - 2 = AのTHIS
+    # FRAME - 3 = AのARG  / FRAME - 4 = AのLCL
+    # FRAME - 5 = Aのreturn address
+    return "\n".join([
+        f"@LCL", "D=M", f"@{FRAME}", "M=D",  # Bのフレーム先頭を覚える
+        f"@5", "A=D-A", "D=M", f"@{RET}", "M=D",  # Aへ戻る番地を覚える
+        "@SP", "AM=M-1", "D=M", "@ARG", "A=M", "M=D",  # Bの結果をAへ渡す
+        "@ARG", "D=M+1", "@SP", "M=D",  # A側のSPを結果の次にする
+        f"@{FRAME}", "AM=M-1", "D=M", "@THAT", "M=D",  # AのTHATを戻す
+        f"@{FRAME}", "AM=M-1", "D=M", "@THIS", "M=D",  # AのTHISを戻す
+        f"@{FRAME}", "AM=M-1", "D=M", "@ARG", "M=D",  # AのARGを戻す
+        f"@{FRAME}", "AM=M-1", "D=M", "@LCL", "M=D",  # AのLCLを戻す
+        f"@{RET}", "A=M", "0;JMP"  # Aの続きへ戻る
+    ])
+
+
+def write_call(function_name, num_args, call_id):
+    """call NAME n を、呼び出し側の保存と関数への移動に変換する。"""
+    # ここは、呼び出し側Aから関数Bへ出発するための準備をする場所
+    # まず、Bの仕事が終わったらAのどこへ戻るかを示すラベルを考える
+    # その戻り先ラベルの番地を、あとでスタックへ保存できる形にする
+    # 次に、Aが使っていたLCLをスタックへ保存する
+    # 次に、Aが使っていたARGをスタックへ保存する
+    # 次に、Aが使っていたTHISをスタックへ保存する
+    # 次に、Aが使っていたTHATをスタックへ保存する
+    # ここまでで、Bが壊してもAへ戻せる状態をスタックに避難できる
+    # BのARGを「呼び出し側が積んだ引数の先頭」に設定する
+    # BのLCLを「Bがこれから使うlocalの先頭」に設定する
+    # 最後に、関数Bの入口ラベルへ無条件ジャンプする
+    # Bから戻ったときにAの続きへ来られるよう、戻り先ラベルも置く
+    return "\n".join([
+        # ここから、上の順番どおりにアセンブリ命令を1行ずつ並べる
+        f"@RETURN_{function_name}_{call_id}", "D=A", "@SP", "A=M", "M=D", "@SP", "M=M+1", 
+        "@LCL", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1",
+        "@ARG", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1",
+        "@THIS", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1",
+        "@THAT", "D=M", "@SP", "A=M", "M=D", "@SP", "M=M+1",
+        "@SP", "D=M", "@5", "D=D-A",f"@{num_args}", "D=D-A", "@ARG", "M=D", 
+        "@SP", "D=M", "@LCL", "M=D", 
+        f"@{function_name}", "0;JMP", f"(RETURN_{function_name}_{call_id})"
+
+        
+        
+        
+    ])
+
+
+def write_init():
+    """プログラム開始時のBootstrapコードを作る。"""
+    # まず、スタックを使い始める位置をSPに設定する
+    # 次に、Sys.initを引数0個で呼び出す
+    # 今はjoinの中身を自分で組み立てる
+    bootstrap_code = "\n".join([
+        "@256", "D=A", "@SP", "M=D"
+    ])
+    call_code = write_call("Sys.init", 0, 0)
+    
+    return "\n".join([
+        bootstrap_code, call_code
+    ])
+    
