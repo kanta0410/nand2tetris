@@ -1,0 +1,51 @@
+class Game {
+    field Player player;
+
+    constructor Game new() {
+        do Screen.clearScreen();
+        let player = Player.new(256,256,15);
+        return this;
+
+    }
+
+    method void run() {
+        var int key;
+        var boolean exit;
+
+        let exit = false;
+
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+
+            if (key = 81) {
+                let exit = true;
+            }
+
+            if (key = 131) {
+                do player.moveUp();
+            }
+
+            if (key = 133) {
+                do player.moveDown();
+            }
+
+            if (key = 130) {
+                do player.moveLeft();
+            }
+
+            if (key = 132) {
+                do player.moveRight();
+            }
+
+            do Sys.wait(50);
+        }
+
+        return;
+    }
+    
+    method void dispose() {
+        do player.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}

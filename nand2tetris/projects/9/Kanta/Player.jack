@@ -1,0 +1,68 @@
+class Player {
+    field int x;
+    field int y;
+    field int radius;
+
+    constructor Player new(int startX, int startY, int startRadius) {
+        let x = startX;
+        let y = startY;
+        let radius = startRadius;
+        do draw();
+        return this;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void moveUp() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius);
+
+        let y = y - 5;
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    method void moveDown() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius);
+
+        let y = y + 5;
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    method void moveLeft() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius);
+
+        let x = x - 5;
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+
+    method void moveRight() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, radius);
+
+        let x = x + 5;
+
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, radius);
+        return;
+    }
+}
